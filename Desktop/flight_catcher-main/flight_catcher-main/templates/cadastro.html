@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Voos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            grid-column: 1 / 3;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .grid-full {
+            grid-column: 1 / 3;
+        }
+    </style>
+    <!-- SweetAlert CSS e JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Registrar Voo</h1>
+        <form id="vooForm" action="/adicionar" method="POST">
+            <div class="form-group">
+                <label for="origem">Origem:</label>
+                <input type="text" id="origem" name="origem" placeholder="Cidade de origem" required>
+            </div>
+            <div class="form-group">
+                <label for="destino">Destino:</label>
+                <input type="text" id="destino" name="destino" placeholder="Cidade de destino" required>
+            </div>
+            <div class="form-group">
+                <label for="data_voo">Data do Voo:</label>
+                <input type="date" id="data_voo" name="data_voo" required>
+            </div>
+            <div class="form-group">
+                <label for="quantidade_viagens">Quantidade de Viagens Disponíveis:</label>
+                <input type="number" id="quantidade_viagens" name="quantidade_viagens" placeholder="Ex: 50" required>
+            </div>
+            <div class="form-group">
+                <label for="custo_reais">Custo (R$):</label>
+                <input type="number" id="custo_reais" name="custo_reais" placeholder="Ex: 1000.00" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="custo_milhas">Custo (Milhas):</label>
+                <input type="number" id="custo_milhas" name="custo_milhas" placeholder="Ex: 30000" required>
+            </div>
+            <div class="form-group grid-full">
+                <label for="programa_fidelidade">Programa de Fidelidade:</label>
+                <select id="programa_fidelidade" name="programa_fidelidade" required>
+                    <option value="" disabled selected>Selecione o programa</option>
+                    <option value="smiles">Smiles</option>
+                    <option value="latam_pass">Latam Pass</option>
+                    <option value="azul">TudoAzul</option>
+                    <option value="tap_victoria">TAP Victoria</option>
+                </select>
+            </div>
+            <input type="submit" value="Registrar Voo">
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('vooForm').onsubmit = function(event) {
+            event.preventDefault();  // Previne o comportamento padrão de envio do formulário
+
+            // Fazendo o envio por AJAX para evitar o reload da página
+            fetch('/adicionar', {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Exibe o modal de sucesso
+                    Swal.fire({
+                        title: 'Sucesso!',
+                        text: 'O voo foi registrado com sucesso.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Redirecionar ou limpar o formulário após o OK
+                        document.getElementById('vooForm').reset();  // Limpa o formulário
+                    });
+                } else {
+                    // Caso haja erro
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: 'Ocorreu um erro ao registrar o voo.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Ocorreu um erro na comunicação com o servidor.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        };
+    </script>
+</body>
+</html>
